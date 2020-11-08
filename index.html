@@ -34,7 +34,7 @@
             // send play action
             player.onplay = function () {
                 //***************
-                sessionFactory.init("karbar");
+                sessionFactory.init();
                 //***************
                 activityFactory.log(channel_id(), content_id, content_type_id(), service_id(), ACTIVITY.Play, player.currentTime);
             }
@@ -54,7 +54,7 @@
     bindPlayer(0);
 // send username 
     document.getElementById("login-button").onclick = function () {
-        sessionFactory.init();
+        sessionFactory.init("karbar");
     }
     // send logout
     document.getElementById("logout-button").onclick = function () {
