@@ -5,37 +5,20 @@
  DUE DATE:  11/14/2020
  Version : 2.0.0
  FUNCTION:  Get Data From Cleint side and send for IRIB Analytic Server
+
  INPUT:     ACTIVITY, SERVICE_TYPE, CONTENT_TYPE
  ****************************************************************/
 
+
 // Local variables
-var timeout = 1, url = "https://statistics.irib.ir:8876/api/", url = "http://localhost:8000/api/", active_session, auth_token = "Token 2156356dfa66dfd64b60ca2992509asd", ip,
-     user_id, ttl = 30, counter = ttl;
+var url = "https://statistics.irib.ir:8876/api/", url = "http://localhost:8000/api/",
+    auth_token = "Token 2156356dfa66dfd64b60ca2992509asd", system_id = "Developer";
+var user_id, active_session, ip, ttl = 30, ttl = 30, counter = ttl;
+
 // Enumerations
-var ACTIVITY = {
-    Play: 1,
-    Pause: 2,
-    FDStart: 3,
-    FDEnd: 4,
-    BDStart: 5,
-    BDEnd: 6,
-    ContentView: 7,
-};
-
-var SERVICE_TYPE = {
-    Live: 1,
-    TimeShift: 2,
-    CatchUp: 3,
-    OnDemand: 4,
-};
-
-var CONTENT_TYPE = {
-    Video: 1,
-    Audio: 2,
-    Image: 3,
-    Text: 4,
-};
-
+var ACTIVITY = {Play: 1, Pause: 2, FDStart: 3, FDEnd: 4, BDStart: 5, BDEnd: 6, ContentView: 7,};
+var SERVICE_TYPE = {Live: 1, TimeShift: 2, CatchUp: 3, OnDemand: 4,};
+var CONTENT_TYPE = {Video: 1, Audio: 2, Image: 3, Text: 4,};
 
 /**
  * Get the user IP throught the webkitRTCPeerConnection
@@ -43,7 +26,6 @@ var CONTENT_TYPE = {
  * @return undefined
  */
 function getUserIP(onNewIP) {
-
     //  onNewIp - your listener function for new IPs
     //compatibility for firefox and chrome
     var myPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
@@ -62,6 +44,7 @@ function getUserIP(onNewIP) {
         ipFound = true;
     }
 
+
     //create a bogus data channel
     pc.createDataChannel("");
 
@@ -78,12 +61,14 @@ function getUserIP(onNewIP) {
         // An error occurred, so handle the failure to connect
     });
 
+
     //listen for candidate events
     pc.onicecandidate = function (ice) {
         if (!ice || !ice.candidate || !ice.candidate.candidate || !ice.candidate.candidate.match(ipRegex)) return;
         ice.candidate.candidate.match(ipRegex).forEach(iterateIP);
     };
 }
+
 
 // A helper function for string manipulation
 if (!String.prototype.format) {
@@ -97,6 +82,7 @@ if (!String.prototype.format) {
         });
     };
 }
+
 
 // Get the value of key 'name' from cookie
 function getCookie(name) {
@@ -117,15 +103,15 @@ function getCookie(name) {
 
 // Sets the key and its value in cookie
 function setCookie(key, value) {
-   // if (!value) {
+    if (!value) {
         // Expire cookie
-        //document.cookie = "{0}=; expires=Thu, 01 Jan 1970 00:00:00 UTC;".format(key);
-    //    return;
-  //  }
+        document.cookie = "{0}=; expires=Thu, 01 Jan 1970 00:00:00 UTC;".format(key);
+        return;
+    }
 
     var dt = new Date();
     dt.setMinutes(dt.getMinutes() + timeout);
-    document.cookie = "{0}={1}; expires=".format(key, value, dt.toUTCString());
+    document.cookie = "{0}={1}; expires={2}".format(key, value, dt.toUTCString());
 }
 
 // Generate a 128bit UUID
@@ -137,6 +123,18 @@ function create_UUID() {
         return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
     });
     return uuid;
+}
+
+
+// Generate a 128bit SID (Session)
+function create_SID() {
+    var dt = new Date().getTime();
+    var sid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = (dt + Math.random() * 16) % 16 | 0;
+        dt = Math.floor(dt / 16);
+        return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+    return sid;
 }
 
 // Get client's ip at page load
@@ -176,14 +174,15 @@ sessionFactory = {
             setCookie('token', token); // Extend session validation
             return;
         }
+        sys_is = system_id
         user_id = _user_id != null ? _user_id : create_UUID();
 
+        session_id = _session_id != null ? _session_id : create_SID();
         user_agent = navigator.userAgent;
         referer = document.location.origin;
         xReferer = document.location.origin;
 
-        var data = '{"user_id": "{0}", "ip": "{1}","user_agent": "{2}", "referer": "{3}", "xReferer": "{4}"}'.format(
-            user_id, ip, user_agent, referer, xReferer);
+        var data = '{"sys_id": "{0}", "user_id": "{1}", "session_id": "{2}", "ip": "{3}","user_agent": "{4}", "referer": "{5}", "xReferer": "{6}"}'.format(system_id, user_id, t, ip, user_agent, referer, xReferer)
 
         var xmlhttp = new XMLHttpRequest();
         xmlhttp.open("POST", "{0}session/".format(url), true);
@@ -226,12 +225,12 @@ sessionFactory = {
 }
 
 activityFactory = {
-    log: function (channel_id, content_id, content_type_id, service_id, action_id, time_code) {
+    log: function (session_id, channel_id, content_id, content_type_id, service_id, action_id, time_code) {
         sessionFactory.check();
         var token = getCookie('token');
 
         var data = '{"session_id": "{0}", "channel_id": "{1}", "content_id": "{2}","content_type_id": "{3}", "service_id": "{4}","action_id": "{5}", "time_code": "{6}"}'.format(
-            token, channel_id, content_id, content_type_id, service_id, action_id, time_code);
+            token,session_id, channel_id, content_id, content_type_id, service_id, action_id, time_code);
 
         var xmlhttp = new XMLHttpRequest();
         xmlhttp.open("POST", "{0}event/".format(url), true);
@@ -250,4 +249,4 @@ activityFactory = {
         xmlhttp.send(data);
         return true;
     }
-}
+
