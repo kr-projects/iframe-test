@@ -229,7 +229,6 @@ activityFactory = {
 
         var data = '{"session_id": "{0}", "channel_id": "{1}", "content_id": "{2}","content_type_id": "{3}", "service_id": "{4}","action_id": "{5}", "time_code": "{6}"}'.format(
             token, channel_id, content_id, content_type_id, service_id, action_id, time_code);
-
         var xmlhttp = new XMLHttpRequest();
         xmlhttp.open("POST", "{0}event/".format(url), true);
         xmlhttp.setRequestHeader("Content-Type", "application/json");
@@ -247,4 +246,3 @@ activityFactory = {
         xmlhttp.send(data);
         return true;
     }
-
