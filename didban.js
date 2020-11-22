@@ -8,8 +8,8 @@
  INPUT:     ACTIVITY, SERVICE_TYPE, CONTENT_TYPE
  ****************************************************************/
 
-var url = "https://statistics.irib.ir:8876/api/", url = "http://localhost:8000/api/",
-    auth_token = "Token 2156356dfa66dfd64b60ca2992509asd", system_id = "ُtelewebion";
+var url = "http://192.168.115.248:8083/", url = "http://localhost:8000/api/",
+    auth_token = "Bearer Lrn90RnJZ+X5nVgQ9cKjrJSpgHTQtkLz3Mw1sX4B7RYnhNdy0Oqp", system_id = "ُtelewebion";
 var user_id, active_session, ip, ttl = 30, ttl = 30, counter = ttl;
 
 
