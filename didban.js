@@ -89,7 +89,7 @@ function getCookie(name) {
 function setCookie(key, value) {
     if (!value) {
      //   document.cookie = "{0}=; expires=Thu, 01 Jan 1970 00:00:00 UTC;".format(key);
-        document.cookie = "{0}= 1; ".format(key);
+      //  document.cookie = "{0}= 1; ".format(key);
         return;
     }
 
@@ -159,16 +159,13 @@ sessionFactory = {
         user_agent = navigator.userAgent;
         referer = document.location.origin;
         xReferer = document.location.origin;
-
         var data = '{"sys_id": "{0}", "user_id": "{1}", "session_id": "{2}", "ip": "{3}","user_agent": "{4}", "referer": "{5}", "xReferer": "{6}"}'.format(sys_id, user_id, t, ip, user_agent, referer, xReferer)
-
         var xmlhttp = new XMLHttpRequest();
         xmlhttp.open("POST", "{0}session/".format(url), true);
         xmlhttp.setRequestHeader("Content-Type", "application/json");
         xmlhttp.setRequestHeader('Authorization', auth_token);
         xmlhttp.onreadystatechange = function (data) {
             if (this.readyState == 4 && this.status == 201) {
-                // @todo: must extract session id
                 setCookie('token', JSON.parse(this.responseText).id);
                 console.log("Success: {0}: {1}".format(this.status, this.responseText));
             } else {
