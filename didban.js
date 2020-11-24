@@ -7,16 +7,14 @@
  FUNCTION:  Get Data From Cleint side and send for IRIB Analytic Server
  INPUT:     ACTIVITY, SERVICE_TYPE, CONTENT_TYPE
  ****************************************************************/
-
-var url = "http://192.168.143.18:8876/api/", url = "http://localhost:8000/api/",
-    auth_token = "Bearer BFC4580A3A1B1527EA26B2C0612250D0", system_id = "ُiribcstwb99";
-var user_id, active_session, ip, ttl = 30, ttl = 30, counter = ttl;
+var url = "http://192.168.143.18:8876/api/",
+    auth_token = "Bearer BFC4580A3A1B1527EA26B2C0612250D0", sys_id = "ُiribcstwb99", system_id, t;
+var user_id, active_session, ip, session_id, ttl = 30, ttl = 30, counter = ttl;
 
 
 var ACTIVITY = {Play: 1, Pause: 2, FDStart: 3, FDEnd: 4, BDStart: 5, BDEnd: 6, ContentView: 7,};
 var SERVICE_TYPE = {Live: 1, TimeShift: 2, CatchUp: 3, OnDemand: 4,};
 var CONTENT_TYPE = {Video: 1, Audio: 2, Image: 3, Text: 4,};
-
 
 function getUserIP(onNewIP) {
     var myPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
@@ -86,17 +84,17 @@ function getCookie(name) {
     return "";
 }
 
-function setCookie(key, value) {
-    if (!value) {
-     //   document.cookie = "{0}=; expires=Thu, 01 Jan 1970 00:00:00 UTC;".format(key);
-      //  document.cookie = "{0}= 1; ".format(key);
-        return;
-    }
+//function setCookie(key, value);
+//{
+  //  if (!value) {
+     //   document.cookie = "{0}=;.format(key);
+       // return;
+    //}
 
-    var dt = new Date();
-    dt.setMinutes(dt.getMinutes() + timeout);
-    document.cookie = "{0}={1}; expires={2}".format(key, value, dt.toUTCString());
-}
+    //var dt = new Date();
+    //dt.setMinutes(dt.getMinutes() + timeout);
+    //document.cookie = "{0}={1}; expires=".format(key, value, dt.toUTCString());
+//}
 
 function create_UUID() {
     var dt = new Date().getTime();
@@ -155,7 +153,7 @@ sessionFactory = {
         }
         sys_is = system_id
         user_id = _user_id != null ? _user_id : create_UUID();
-        session_id = _session_id != null ? _session_id : create_SID();
+        session_id = session_id != null ? session_id : create_SID();
         user_agent = navigator.userAgent;
         referer = document.location.origin;
         xReferer = document.location.origin;
@@ -177,7 +175,7 @@ sessionFactory = {
     },
 
     expire: function () {
-        var session_id = getCookie('session_id');
+        var token = getCookie('token');
 
         var xmlhttp = new XMLHttpRequest();
         xmlhttp.open("PATCH", "{0}session/{1}/".format(url, token), true);
@@ -185,7 +183,7 @@ sessionFactory = {
         xmlhttp.setRequestHeader('Authorization', auth_token);
         xmlhttp.onreadystatechange = function (data) {
             if (this.readyState == 4 && this.status == 200) {
-                setCookie('session_id', null);
+                setCookie('token', null);
                 console.log("Success: {0}: {1}".format(this.status, this.responseText));
                 user_id = null;
             } else {
@@ -198,7 +196,7 @@ sessionFactory = {
 }
 
 activityFactory = {
-    log: function (channel_id, content_id, content_type_id, service_id, action_id, time_code) {
+    log: function (session_id, channel_id, content_id, content_type_id, service_id, action_id, time_code) {
         sessionFactory.check();
         var token = getCookie('token');
 
@@ -211,13 +209,14 @@ activityFactory = {
         xmlhttp.setRequestHeader('Authorization', auth_token);
         xmlhttp.onreadystatechange = function () {
             if (this.readyState == 4 && this.status == 201) {
-                setCookie('session_id', session_id);
-                console.log("session_id {0} did activity {1}".format(session_id, action_id));
+                setCookie('token', session_id);
+                console.log("token {0} did activity {1}".format(token, action_id));
             } else {
 
                 console.log("Activity logging failed.")
-            }
+            };
         };
         xmlhttp.send(data);
         return true;
     }
+}
