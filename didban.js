@@ -8,8 +8,8 @@
  INPUT:     ACTIVITY, SERVICE_TYPE, CONTENT_TYPE
  ****************************************************************/
 
-var url = "http://192.168.115.248:8083/", url = "http://localhost:8000/api/",
-    auth_token = "Bearer Lrn90RnJZ+X5nVgQ9cKjrJSpgHTQtkLz3Mw1sX4B7RYnhNdy0Oqp", system_id = "ُtelewebion";
+var url = "http://192.168.143.18:8876/api/", url = "http://localhost:8000/api/",
+    auth_token = "Bearer BFC4580A3A1B1527EA26B2C0612250D0", system_id = "ُiribcstwb99";
 var user_id, active_session, ip, ttl = 30, ttl = 30, counter = ttl;
 
 
